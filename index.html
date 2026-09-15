@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TaiTai Web</title>
     
     <!-- PeerJS & Firebase SDKs -->
@@ -17,27 +17,32 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #111b21;
             color: #e9edef;
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
         }
 
         .app-container {
             width: 100%;
+            height: 100%;
             max-width: 1600px;
-            height: 100vh;
             display: flex;
             background: #111b21;
             position: relative;
+            overflow: hidden;
         }
 
+        /* --- AUTH & PROFILE OVERLAYS --- */
         .overlay {
             position: absolute;
             inset: 0;
@@ -45,42 +50,46 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
+            padding: 20px;
         }
 
         .card {
             background: #202c33;
-            padding: 30px;
+            padding: 28px 24px;
             border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
+            width: 100%;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            gap: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #222d34;
         }
 
-        .card h2 { color: #00a884; text-align: center; }
+        .card h2 { color: #00a884; text-align: center; font-size: 24px; }
 
         input {
             width: 100%;
-            padding: 11px 14px;
+            padding: 12px 14px;
             border-radius: 8px;
             border: 1px solid #2a3942;
             background: #2a3942;
             color: #e9edef;
             outline: none;
-            font-size: 14px;
+            font-size: 15px;
         }
+        input:focus { border-color: #00a884; }
 
         .btn-green {
             background: #00a884;
             color: #111b21;
-            font-weight: bold;
+            font-weight: 700;
             border: none;
-            padding: 11px;
+            padding: 12px;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 15px;
             transition: background 0.2s;
         }
         .btn-green:hover { background: #008f6f; }
@@ -89,14 +98,15 @@
             background: #ffffff;
             color: #111b21;
             border: none;
-            padding: 10px;
+            padding: 11px;
             border-radius: 8px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .toggle-link {
@@ -104,37 +114,43 @@
             color: #8696a0;
             text-align: center;
             cursor: pointer;
+            margin-top: 4px;
         }
-        .toggle-link span { color: #00a884; }
+        .toggle-link span { color: #00a884; font-weight: 600; }
 
         .hidden { display: none !important; }
 
+        /* --- SIDEBAR PANEL --- */
         .sidebar {
             width: 380px;
             background: #111b21;
             border-right: 1px solid #222d34;
             display: flex;
             flex-direction: column;
+            height: 100%;
+            transition: transform 0.3s ease;
+            z-index: 10;
         }
 
         .sidebar-header {
-            height: 60px;
+            height: 64px;
             background: #202c33;
             padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #222d34;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: #00a884;
             display: flex;
@@ -142,34 +158,37 @@
             justify-content: center;
             font-weight: bold;
             color: #111b21;
-            font-size: 16px;
+            font-size: 17px;
+            flex-shrink: 0;
         }
 
-        .user-meta { display: flex; flex-direction: column; }
-        .user-name { font-weight: 600; font-size: 14px; color: #e9edef; }
+        .user-meta { display: flex; flex-direction: column; overflow: hidden; }
+        .user-name { font-weight: 600; font-size: 15px; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-tag { font-size: 12px; color: #8696a0; }
 
-        .logout-icon {
+        .logout-btn {
             background: transparent;
             border: none;
             color: #8696a0;
             font-size: 18px;
             cursor: pointer;
+            padding: 6px;
         }
+        .logout-btn:hover { color: #f15c6d; }
 
         .social-stats {
             display: flex;
             justify-content: space-around;
             background: #182229;
-            padding: 10px;
+            padding: 12px 10px;
             border-bottom: 1px solid #222d34;
             text-align: center;
         }
-        .stat-item { font-size: 12px; color: #8696a0; }
-        .stat-item strong { display: block; color: #00a884; font-size: 14px; }
+        .stat-item { font-size: 11px; color: #8696a0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-item strong { display: block; color: #00a884; font-size: 16px; font-weight: 700; margin-bottom: 2px; }
 
         .search-box {
-            padding: 10px 16px;
+            padding: 12px 16px;
             background: #111b21;
             border-bottom: 1px solid #222d34;
         }
@@ -183,20 +202,22 @@
 
         .user-card {
             padding: 12px 16px;
-            border-bottom: 1px solid #222d34;
+            border-bottom: 1px solid #182229;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
         .user-card:hover { background: #202c33; }
 
         .action-btns {
             display: flex;
             gap: 6px;
+            flex-shrink: 0;
         }
 
         .btn-small {
-            padding: 6px 10px;
+            padding: 7px 12px;
             font-size: 12px;
             border-radius: 6px;
             border: none;
@@ -205,76 +226,136 @@
         }
 
         .btn-follow { background: #3b82f6; color: white; }
-        .btn-following { background: #334155; color: #94a3b8; }
-        .btn-friend { background: #10b981; color: white; }
+        .btn-following { background: #2a3942; color: #94a3b8; }
+        .btn-friend { background: #00a884; color: #111b21; }
 
+        /* --- MAIN CHAT PANEL --- */
         .main-chat {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: #0b141a;
             position: relative;
+            height: 100%;
         }
 
         .chat-wallpaper {
             position: absolute;
             inset: 0;
-            opacity: 0.06;
+            opacity: 0.05;
             background-image: radial-gradient(#8696a0 1px, transparent 0);
             background-size: 16px 16px;
             pointer-events: none;
         }
 
         .chat-header {
-            height: 60px;
+            height: 64px;
             background: #202c33;
             padding: 10px 16px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             z-index: 2;
             border-bottom: 1px solid #222d34;
         }
 
+        .back-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: #00a884;
+            font-size: 22px;
+            cursor: pointer;
+            padding-right: 4px;
+        }
+
         .messages-container {
             flex: 1;
-            padding: 20px 5%;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             z-index: 2;
         }
 
         .msg-bubble {
-            max-width: 65%;
-            padding: 8px 12px;
+            max-width: 80%;
+            padding: 9px 12px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 14.5px;
+            line-height: 1.4;
             position: relative;
             word-wrap: break-word;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.2);
         }
 
-        .msg-bubble.mine { align-self: flex-end; background: #005c4b; color: #e9edef; }
-        .msg-bubble.other { align-self: flex-start; background: #202c33; color: #e9edef; }
-        .msg-bubble.system { align-self: center; background: #182229; color: #8696a0; font-size: 12px; }
+        .msg-bubble.mine { align-self: flex-end; background: #005c4b; color: #e9edef; border-top-right-radius: 0; }
+        .msg-bubble.other { align-self: flex-start; background: #202c33; color: #e9edef; border-top-left-radius: 0; }
+        .msg-bubble.system { align-self: center; background: #182229; color: #8696a0; font-size: 12px; border-radius: 6px; padding: 6px 14px; text-align: center; }
 
         .chat-footer {
-            height: 62px;
+            min-height: 62px;
             background: #202c33;
-            padding: 10px 16px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
             z-index: 2;
         }
 
-        .chat-footer input { flex: 1; }
+        .chat-footer input { flex: 1; border-radius: 20px; padding: 10px 18px; }
+
+        .send-icon-btn {
+            background: #00a884;
+            color: #111b21;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .send-icon-btn:disabled { background: #2a3942; color: #8696a0; cursor: not-allowed; }
+
+        /* --- RESPONSIVE MOBILE MEDIA QUERIES --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: absolute;
+                inset: 0;
+            }
+
+            .main-chat {
+                width: 100%;
+                position: absolute;
+                inset: 0;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+
+            .app-container.mobile-chat-active .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .app-container.mobile-chat-active .main-chat {
+                transform: translateX(0);
+            }
+
+            .back-btn {
+                display: block;
+            }
+
+            .msg-bubble { max-width: 88%; }
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-container" id="app-container">
 
     <!-- Auth Screen -->
     <div id="auth-screen" class="overlay">
@@ -294,13 +375,13 @@
         </div>
     </div>
 
-    <!-- Profile Creation Screen -->
+    <!-- Profile Setup Screen -->
     <div id="profile-setup-screen" class="overlay hidden">
         <div class="card">
-            <h2>Set Your Profile</h2>
+            <h2>Setup Profile</h2>
             <input type="text" id="setup-name" placeholder="Full Name">
-            <input type="text" id="setup-username" placeholder="Choose Username (e.g., user123)">
-            <button class="btn-green" onclick="saveProfile()">Save & Start</button>
+            <input type="text" id="setup-username" placeholder="Username (e.g. user123)">
+            <button class="btn-green" onclick="saveProfile()">Save & Continue</button>
         </div>
     </div>
 
@@ -314,7 +395,7 @@
                     <div class="user-tag" id="user-username">@username</div>
                 </div>
             </div>
-            <button class="logout-icon" onclick="logout()" title="Logout">✕</button>
+            <button class="logout-btn" onclick="logout()" title="Logout">✕</button>
         </div>
 
         <div class="social-stats">
@@ -324,7 +405,7 @@
         </div>
 
         <div class="search-box">
-            <input type="text" id="search-input" placeholder="Search by username..." onkeyup="searchUsers()">
+            <input type="text" id="search-input" placeholder="Search usernames..." onkeyup="searchUsers()">
         </div>
 
         <div class="results-list" id="user-results"></div>
@@ -335,20 +416,23 @@
         <div class="chat-wallpaper"></div>
 
         <div class="chat-header">
-            <div class="avatar" id="active-chat-avatar">#</div>
-            <div>
-                <h3 id="active-chat-name" style="font-size: 16px;">No Active Chat</h3>
-                <span id="active-chat-status" style="font-size: 12px; color: #8696a0;">Select a user from the left sidebar</span>
+            <button class="back-btn" onclick="closeMobileChat()">←</button>
+            <div class="avatar" id="active-chat-avatar" style="background: #2a3942;">#</div>
+            <div class="user-meta">
+                <div class="user-name" id="active-chat-name">No Chat Selected</div>
+                <div class="user-tag" id="active-chat-status">Select a user to chat</div>
             </div>
         </div>
 
         <div class="messages-container" id="messages-container">
-            <div class="msg-bubble system">Search users on the left to follow or chat.</div>
+            <div class="msg-bubble system">Search users on the left sidebar to add friends or start messaging.</div>
         </div>
 
         <div class="chat-footer">
             <input type="text" id="message-input" placeholder="Type a message" disabled onkeypress="handleKey(event)">
-            <button class="btn-green" id="send-btn" onclick="sendMessage()" disabled style="border-radius: 50%; width: 42px; height: 42px; padding: 0;">➔</button>
+            <button class="send-icon-btn" id="send-btn" onclick="sendMessage()" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
         </div>
     </div>
 
@@ -380,7 +464,6 @@
             currentUser = user;
             document.getElementById('auth-screen').classList.add('hidden');
             
-            // Listen to real-time changes on profile
             db.collection('users').doc(user.uid).onSnapshot((doc) => {
                 if (doc.exists) {
                     userProfile = doc.data();
@@ -403,7 +486,7 @@
         if (!name || !username) return alert("Please fill all fields!");
 
         const query = await db.collection('users').where('username', '==', username).get();
-        if (!query.empty) return alert("Username already taken! Choose another.");
+        if (!query.empty) return alert("Username taken! Choose another.");
 
         userProfile = {
             uid: currentUser.uid,
@@ -518,6 +601,13 @@
         const targetPeerId = `taitai-user-${targetUsername}`;
         activeConnection = peer.connect(targetPeerId);
         setupChatListeners();
+
+        // Open chat panel on mobile view
+        document.getElementById('app-container').classList.add('mobile-chat-active');
+    }
+
+    function closeMobileChat() {
+        document.getElementById('app-container').classList.remove('mobile-chat-active');
     }
 
     function setupChatListeners() {
