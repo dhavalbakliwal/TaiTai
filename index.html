@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P2P Messenger - taitai</title>
+    <title>TaiTai Web</title>
     
-    <!-- PeerJS for Real-time Messaging -->
+    <!-- PeerJS & Firebase SDKs -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    
-    <!-- Firebase App & Auth SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
@@ -17,290 +15,394 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #111b21;
+            color: #e9edef;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .container {
-            width: 90%;
-            max-width: 800px;
-            height: 85vh;
-            background: #1e293b;
-            border-radius: 12px;
+        /* App Container */
+        .app-container {
+            width: 100%;
+            max-width: 1600px;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            overflow: hidden;
+            background: #111b21;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.5);
             position: relative;
         }
 
+        /* --- AUTH OVERLAY --- */
         .auth-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f172a;
+            inset: 0;
+            background: #111b21;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10;
-            padding: 20px;
+            z-index: 100;
         }
 
         .auth-card {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 360px;
+            background: #202c33;
+            padding: 35px 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            gap: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         }
 
-        .auth-card h3 {
+        .auth-header {
             text-align: center;
-            color: #38bdf8;
+            margin-bottom: 10px;
         }
 
-        .divider {
-            text-align: center;
-            color: #64748b;
-            font-size: 12px;
-            margin: 2px 0;
+        .auth-header h2 {
+            color: #00a884;
+            font-size: 24px;
         }
 
-        .google-btn {
-            background: #ffffff;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-        .google-btn:hover { background: #e2e8f0; }
-
-        .phone-toggle-btn {
-            background: #10b981;
-            color: white;
-            font-weight: 600;
-        }
-        .phone-toggle-btn:hover { background: #059669; }
-
-        .auth-card .toggle-text {
-            font-size: 13px;
-            text-align: center;
-            color: #94a3b8;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        .auth-card .toggle-text span {
-            color: #3b82f6;
-            text-decoration: underline;
-        }
-
-        .hidden { display: none !important; }
-
-        .header {
-            padding: 16px;
-            background: #0f172a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #334155;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .status-badge {
-            background: #334155;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #38bdf8;
-        }
-
-        .setup-section {
-            padding: 15px;
-            background: #1e293b;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        input {
-            padding: 10px 14px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #fff;
+        .auth-card input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #2a3942;
+            color: #e9edef;
             outline: none;
             font-size: 14px;
         }
 
-        #room-input { flex: 1; }
-
-        button {
-            padding: 10px 16px;
-            border-radius: 6px;
-            border: none;
-            background: #3b82f6;
-            color: white;
+        .btn-green {
+            background: #00a884;
+            color: #111b21;
             font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background 0.2s;
         }
+        .btn-green:hover { background: #008f6f; }
 
-        button:hover { background: #2563eb; }
-        button:disabled { background: #475569; cursor: not-allowed; }
-
-        .logout-btn {
-            background: #ef4444;
-            padding: 6px 12px;
-            font-size: 12px;
+        .btn-google {
+            background: #ffffff;
+            color: #111b21;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
         }
-        .logout-btn:hover { background: #dc2626; }
 
-        .chat-box {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+        .toggle-link {
+            font-size: 13px;
+            color: #8696a0;
+            text-align: center;
+            cursor: pointer;
+        }
+        .toggle-link span { color: #00a884; }
+
+        .hidden { display: none !important; }
+
+        /* --- SIDEBAR PANEL --- */
+        .sidebar {
+            width: 350px;
+            background: #111b21;
+            border-right: 1px solid #222d34;
             display: flex;
             flex-direction: column;
-            gap: 12px;
         }
 
-        .message {
-            max-width: 70%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .message.mine {
-            align-self: flex-end;
-            background: #2563eb;
-            color: white;
-        }
-
-        .message.other {
-            align-self: flex-start;
-            background: #334155;
-            color: white;
-        }
-
-        .message.system {
-            align-self: center;
-            background: transparent;
-            color: #64748b;
-            font-size: 12px;
-        }
-
-        .meta {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-bottom: 3px;
-        }
-
-        .input-section {
-            padding: 15px;
-            background: #0f172a;
+        .sidebar-header {
+            height: 60px;
+            background: #202c33;
+            padding: 10px 16px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        #message-input { flex: 1; }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b7c85;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #e9edef;
+        }
+
+        .logout-icon {
+            background: transparent;
+            border: none;
+            color: #8696a0;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .logout-icon:hover { color: #f15c6d; }
+
+        .room-controls {
+            padding: 12px 16px;
+            background: #111b21;
+            border-bottom: 1px solid #222d34;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .room-controls input {
+            background: #202c33;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #e9edef;
+            outline: none;
+            font-size: 14px;
+        }
+
+        /* --- MAIN CHAT PANEL --- */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0b141a;
+            position: relative;
+        }
+
+        /* WhatsApp Chat Background Wallpaper Pattern */
+        .chat-wallpaper {
+            position: absolute;
+            inset: 0;
+            opacity: 0.06;
+            background-image: radial-gradient(#8696a0 1px, transparent 0);
+            background-size: 16px 16px;
+            pointer-events: none;
+        }
+
+        .chat-header {
+            height: 60px;
+            background: #202c33;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 2;
+            border-bottom: 1px solid #222d34;
+        }
+
+        .room-info h3 {
+            font-size: 16px;
+            color: #e9edef;
+        }
+
+        .room-info span {
+            font-size: 12px;
+            color: #8696a0;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px 5%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        /* Message Bubbles */
+        .msg-bubble {
+            max-width: 65%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14.2px;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
+        }
+
+        .msg-bubble.mine {
+            align-self: flex-end;
+            background: #005c4b;
+            color: #e9edef;
+            border-top-right-radius: 0;
+        }
+
+        .msg-bubble.other {
+            align-self: flex-start;
+            background: #202c33;
+            color: #e9edef;
+            border-top-left-radius: 0;
+        }
+
+        .msg-bubble.system {
+            align-self: center;
+            background: #182229;
+            color: #8696a0;
+            font-size: 12px;
+            border-radius: 6px;
+            padding: 5px 12px;
+            margin: 4px 0;
+        }
+
+        .msg-author {
+            font-size: 12px;
+            font-weight: 600;
+            color: #53bdeb;
+            margin-bottom: 3px;
+        }
+
+        .msg-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8696a0;
+            margin-top: 2px;
+            float: right;
+            margin-left: 12px;
+        }
+
+        .msg-bubble.mine .msg-footer { color: #73b3a6; }
+
+        /* Input Footer */
+        .chat-footer {
+            height: 62px;
+            background: #202c33;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            background: #2a3942;
+            border: none;
+            padding: 11px 16px;
+            border-radius: 8px;
+            color: #e9edef;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .send-btn {
+            background: #00a884;
+            color: #111b21;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .send-btn:disabled { background: #2a3942; color: #8696a0; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-container">
+
     <!-- Auth Screen -->
     <div id="auth-screen" class="auth-overlay">
         <div class="auth-card">
-            <h3 id="auth-title">Login</h3>
+            <div class="auth-header">
+                <h2>TaiTai Web</h2>
+                <p style="font-size: 13px; color: #8696a0; margin-top: 4px;">Sign in to start messaging</p>
+            </div>
             
-            <button class="google-btn" onclick="handleGoogleAuth()">
-                <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                </svg>
+            <button class="btn-google" onclick="handleGoogleAuth()">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                 Continue with Google
             </button>
 
-            <button id="phone-toggle-btn" class="phone-toggle-btn" onclick="togglePhoneAuth()">
-                📱 Use Phone Number
-            </button>
+            <div style="text-align: center; color: #8696a0; font-size: 12px;">OR</div>
 
-            <div class="divider">OR</div>
+            <input type="email" id="auth-email" placeholder="Email Address">
+            <input type="password" id="auth-password" placeholder="Password">
+            <button class="btn-green" id="auth-btn" onclick="handleAuth()">Log In</button>
 
-            <!-- Email Form Section -->
-            <div id="email-section" style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="email" id="auth-email" placeholder="Email Address">
-                <input type="password" id="auth-password" placeholder="Password (min 6 chars)">
-                <button id="auth-btn" onclick="handleAuth()">Login</button>
-            </div>
-
-            <!-- Phone Form Section -->
-            <div id="phone-section" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="tel" id="auth-phone" placeholder="Phone Number (e.g., +919876543210)">
-                <button id="send-otp-btn" onclick="sendOTP()">Send OTP</button>
-                <div id="recaptcha-container"></div>
-                
-                <input type="text" id="auth-otp" class="hidden" placeholder="Enter 6-digit OTP">
-                <button id="verify-otp-btn" class="hidden" onclick="verifyOTP()">Verify OTP</button>
-            </div>
-
-            <p class="toggle-text" id="auth-toggle" onclick="toggleAuthMode()">
-                Don't have an account? <span>Register</span>
+            <p class="toggle-link" id="auth-toggle" onclick="toggleAuthMode()">
+                Need an account? <span>Register</span>
             </p>
         </div>
     </div>
 
-    <!-- App Main Interface -->
-    <div class="header">
-        <h2>P2P Room Messenger</h2>
-        <div class="user-info">
-            <span id="current-user-display" style="font-size: 13px; font-weight: bold;"></span>
-            <div class="status-badge" id="status-badge">Disconnected</div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+    <!-- Sidebar Panel -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-profile">
+                <div class="avatar" id="user-avatar">?</div>
+                <div class="user-name" id="user-display">Loading...</div>
+            </div>
+            <button class="logout-icon" onclick="logout()" title="Logout">✕</button>
+        </div>
+
+        <div class="room-controls">
+            <input type="text" id="room-input" placeholder="Type Room Code (e.g. squad123)">
+            <button class="btn-green" id="join-btn" onclick="joinRoom()">Join Room</button>
         </div>
     </div>
 
-    <div class="setup-section">
-        <input type="text" id="room-input" placeholder="Enter Room Name (e.g. squad123)">
-        <button id="join-btn" onclick="joinRoom()">Join Room</button>
+    <!-- Main Chat Panel -->
+    <div class="main-chat">
+        <div class="chat-wallpaper"></div>
+
+        <div class="chat-header">
+            <div class="avatar" style="background: #00a884;">#</div>
+            <div class="room-info">
+                <h3 id="room-title">No Room Joined</h3>
+                <span id="room-status">Enter a room name on the left to start</span>
+            </div>
+        </div>
+
+        <div class="messages-container" id="messages-container">
+            <div class="msg-bubble system">Join a room to start messaging friends.</div>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" id="message-input" placeholder="Type a message" disabled onkeypress="handleKey(event)">
+            <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
     </div>
 
-    <div class="chat-box" id="chat-box">
-        <div class="message system">Enter a room name and click "Join Room" to chat.</div>
-    </div>
-
-    <div class="input-section">
-        <input type="text" id="message-input" placeholder="Type a message..." disabled onkeypress="handleKey(event)">
-        <button id="send-btn" onclick="sendMessage()" disabled>Send</button>
-    </div>
 </div>
 
 <script>
@@ -314,14 +416,11 @@
         measurementId: "G-1BXXCJ9EDT"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
     let currentUser = null;
     let isRegistering = false;
-    let isPhoneMode = false;
-    let confirmationResult = null;
     let peer = null;
     let connections = [];
     let isHost = false;
@@ -334,12 +433,12 @@
         ]}
     };
 
-    // Auth State Listener
     auth.onAuthStateChanged((user) => {
         if (user) {
             currentUser = user;
-            const displayName = user.displayName || user.phoneNumber || user.email.split('@')[0];
-            document.getElementById('current-user-display').innerText = `@${displayName}`;
+            const name = user.displayName || user.email.split('@')[0];
+            document.getElementById('user-display').innerText = name;
+            document.getElementById('user-avatar').innerText = name.charAt(0).toUpperCase();
             document.getElementById('auth-screen').classList.add('hidden');
         } else {
             currentUser = null;
@@ -347,99 +446,29 @@
         }
     });
 
-    // Google Sign-In Handler
     async function handleGoogleAuth() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        try {
-            await auth.signInWithPopup(provider);
-        } catch (error) {
-            alert("Google Sign-In Error: " + error.message);
-        }
-    }
-
-    // Phone Auth Handlers
-    function togglePhoneAuth() {
-        isPhoneMode = !isPhoneMode;
-        const emailSec = document.getElementById('email-section');
-        const phoneSec = document.getElementById('phone-section');
-        const toggleBtn = document.getElementById('phone-toggle-btn');
-
-        if (isPhoneMode) {
-            emailSec.classList.add('hidden');
-            phoneSec.classList.remove('hidden');
-            toggleBtn.innerText = "📧 Use Email Instead";
-            setupRecaptcha();
-        } else {
-            emailSec.classList.remove('hidden');
-            phoneSec.classList.add('hidden');
-            toggleBtn.innerText = "📱 Use Phone Number";
-        }
-    }
-
-    function setupRecaptcha() {
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                'size': 'invisible'
-            });
-        }
-    }
-
-    async function sendOTP() {
-        const phoneNumber = document.getElementById('auth-phone').value.trim();
-        if (!phoneNumber.startsWith('+')) return alert("Phone number must include country code! E.g., +91XXXXXXXXXX");
-
-        try {
-            const appVerifier = window.recaptchaVerifier;
-            confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
-            alert("OTP sent to your phone!");
-            
-            document.getElementById('auth-phone').disabled = true;
-            document.getElementById('send-otp-btn').classList.add('hidden');
-            document.getElementById('auth-otp').classList.remove('hidden');
-            document.getElementById('verify-otp-btn').classList.remove('hidden');
-        } catch (error) {
-            alert("Phone Auth Error: " + error.message);
-            if (window.recaptchaVerifier) window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
-        }
-    }
-
-    async function verifyOTP() {
-        const code = document.getElementById('auth-otp').value.trim();
-        if (!code) return alert("Please enter the 6-digit OTP!");
-
-        try {
-            await confirmationResult.confirm(code);
-            alert("Phone number verified successfully!");
-        } catch (error) {
-            alert("Invalid OTP: " + error.message);
-        }
+        try { await auth.signInWithPopup(provider); } 
+        catch (e) { alert("Google Auth Error: " + e.message); }
     }
 
     function toggleAuthMode() {
         isRegistering = !isRegistering;
-        document.getElementById('auth-title').innerText = isRegistering ? "Register Account" : "Login";
-        document.getElementById('auth-btn').innerText = isRegistering ? "Create Account" : "Login";
+        document.getElementById('auth-btn').innerText = isRegistering ? "Register" : "Log In";
         document.getElementById('auth-toggle').innerHTML = isRegistering 
-            ? "Already have an account? <span>Login</span>"
-            : "Don't have an account? <span>Register</span>";
+            ? "Have an account? <span>Log In</span>"
+            : "Need an account? <span>Register</span>";
     }
 
     async function handleAuth() {
         const email = document.getElementById('auth-email').value.trim();
         const password = document.getElementById('auth-password').value.trim();
-
-        if (!email || !password) return alert("Please fill in both email and password!");
+        if (!email || !password) return alert("Please fill all fields!");
 
         try {
-            if (isRegistering) {
-                await auth.createUserWithEmailAndPassword(email, password);
-                alert("Account created successfully!");
-            } else {
-                await auth.signInWithEmailAndPassword(email, password);
-            }
-        } catch (error) {
-            alert("Auth Error: " + error.message);
-        }
+            if (isRegistering) await auth.createUserWithEmailAndPassword(email, password);
+            else await auth.signInWithEmailAndPassword(email, password);
+        } catch (e) { alert(e.message); }
     }
 
     function logout() {
@@ -449,39 +478,34 @@
         });
     }
 
-    // P2P Messaging Logic
+    // --- P2P Messenger Logic ---
     function joinRoom() {
-        const roomName = document.getElementById('room-input').value.trim().toLowerCase();
+        const room = document.getElementById('room-input').value.trim().toLowerCase();
+        if (!room) return alert("Enter a room name!");
 
-        if (!roomName) return alert("Please enter a room name!");
-        if (!currentUser) return alert("You must be logged in to join a room.");
-
-        currentRoom = roomName;
-        const hostPeerId = `room-messenger-${roomName}`;
+        currentRoom = room;
+        const hostPeerId = `room-messenger-${room}`;
 
         document.getElementById('join-btn').disabled = true;
-        document.getElementById('room-input').disabled = true;
-        updateStatus("Connecting...");
+        document.getElementById('room-title').innerText = `Room: ${room}`;
+        document.getElementById('room-status').innerText = "Connecting...";
 
         peer = new Peer(hostPeerId, peerConfig);
 
         peer.on('open', () => {
             isHost = true;
-            updateStatus(`Hosting Room: ${roomName}`);
-            appendSystemMessage(`Room created! You are hosting "${roomName}".`);
+            document.getElementById('room-status').innerText = "Online (Hosting Room)";
+            appendSystemMessage(`Room created! Tell friends to join: "${room}"`);
             enableChat();
         });
 
-        peer.on('connection', (conn) => {
-            setupHostConnection(conn);
-        });
+        peer.on('connection', (conn) => setupHostConnection(conn));
 
         peer.on('error', (err) => {
-            if (err.type === 'unavailable-id') {
-                connectAsMember(hostPeerId);
-            } else {
+            if (err.type === 'unavailable-id') connectAsMember(hostPeerId);
+            else {
                 appendSystemMessage("Connection error: " + err.type);
-                resetUI();
+                document.getElementById('join-btn').disabled = false;
             }
         });
     }
@@ -498,89 +522,88 @@
 
     function setupHostConnection(conn) {
         connections.push(conn);
-
-        conn.on('open', () => {
-            appendSystemMessage("A user joined the room.");
-        });
-
+        conn.on('open', () => appendSystemMessage("A friend joined the room."));
         conn.on('data', (data) => {
             if (data.type === 'chat') {
-                appendMessage(data.sender, data.text, 'other');
+                appendMessage(data.sender, data.text, 'other', data.time);
                 broadcast(data, conn);
             } else if (data.type === 'system') {
                 appendSystemMessage(data.text);
                 broadcast(data, conn);
             }
         });
-
         conn.on('close', () => {
             connections = connections.filter(c => c !== conn);
-            appendSystemMessage("A user left the room.");
+            appendSystemMessage("A friend disconnected.");
         });
     }
 
     function setupMemberConnection(conn) {
         conn.on('open', () => {
             connections = [conn];
-            updateStatus(`In Room: ${currentRoom}`);
+            document.getElementById('room-status').innerText = "Online";
             enableChat();
 
-            const username = currentUser.displayName || currentUser.phoneNumber || currentUser.email.split('@')[0];
-            conn.send({ type: 'system', text: `${username} joined the room.` });
+            const name = currentUser.displayName || currentUser.email.split('@')[0];
+            conn.send({ type: 'system', text: `${name} joined the chat.` });
         });
 
         conn.on('data', (data) => {
-            if (data.type === 'chat') {
-                appendMessage(data.sender, data.text, 'other');
-            } else if (data.type === 'system') {
-                appendSystemMessage(data.text);
-            }
+            if (data.type === 'chat') appendMessage(data.sender, data.text, 'other', data.time);
+            else if (data.type === 'system') appendSystemMessage(data.text);
         });
 
         conn.on('close', () => {
-            appendSystemMessage("Host left the room. Disconnected.");
+            appendSystemMessage("Host left the room.");
             disableChat();
-            resetUI();
         });
     }
 
     function sendMessage() {
         const input = document.getElementById('message-input');
         const text = input.value.trim();
-
         if (!text) return;
 
-        const senderHandle = currentUser.displayName || currentUser.phoneNumber || currentUser.email.split('@')[0];
-        const payload = { type: 'chat', sender: senderHandle, text: text };
-        
-        connections.forEach(conn => conn.send(payload));
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const sender = currentUser.displayName || currentUser.email.split('@')[0];
+        const payload = { type: 'chat', sender, text, time };
 
-        appendMessage('You', text, 'mine');
+        connections.forEach(c => c.send(payload));
+        appendMessage('You', text, 'mine', time);
         input.value = '';
     }
 
     function broadcast(data, excludeConn) {
-        connections.forEach(conn => {
-            if (conn !== excludeConn) conn.send(data);
-        });
+        connections.forEach(c => { if (c !== excludeConn) c.send(data); });
     }
 
-    function appendMessage(sender, text, type) {
-        const chatBox = document.getElementById('chat-box');
+    function appendMessage(sender, text, type, time) {
+        const container = document.getElementById('messages-container');
         const msg = document.createElement('div');
-        msg.className = `message ${type}`;
-        msg.innerHTML = `<div class="meta">${escapeHTML(sender)}</div>${escapeHTML(text)}`;
-        chatBox.appendChild(msg);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        msg.className = `msg-bubble ${type}`;
+        
+        const authorHtml = type === 'other' ? `<div class="msg-author">${escapeHTML(sender)}</div>` : '';
+        const ticksHtml = type === 'mine' ? ' <span style="color:#53bdeb;">✓✓</span>' : '';
+
+        msg.innerHTML = `
+            ${authorHtml}
+            <span>${escapeHTML(text)}</span>
+            <div class="msg-footer">
+                <span>${time}</span>${ticksHtml}
+            </div>
+        `;
+        
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
     }
 
     function appendSystemMessage(text) {
-        const chatBox = document.getElementById('chat-box');
+        const container = document.getElementById('messages-container');
         const msg = document.createElement('div');
-        msg.className = 'message system';
+        msg.className = 'msg-bubble system';
         msg.innerText = text;
-        chatBox.appendChild(msg);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
     }
 
     function enableChat() {
@@ -593,24 +616,10 @@
         document.getElementById('send-btn').disabled = true;
     }
 
-    function updateStatus(text) {
-        document.getElementById('status-badge').innerText = text;
-    }
-
-    function resetUI() {
-        document.getElementById('join-btn').disabled = false;
-        document.getElementById('room-input').disabled = false;
-        updateStatus("Disconnected");
-    }
-
-    function handleKey(e) {
-        if (e.key === 'Enter') sendMessage();
-    }
+    function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
 
     function escapeHTML(str) {
-        return str.replace(/[&<>'"]/g, 
-            tag => ({ '&': '&amp;', '<': '&lt;'> '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-        );
+        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 </script>
 </body>
