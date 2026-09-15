@@ -779,36 +779,61 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-// --- PROFILE SETUP ---
+// --- PROFILE SETUP & USERNAME CHECK ---
 function updateSetupAvatar(){
   const name = document.getElementById('setup-name').value.trim();
   const el = document.getElementById('setup-avatar-preview');
   el.innerText = initials(name);
   el.style.background = name ? colorForString(name) : '#8e8e93';
 }
-async function saveProfile(){
+async function saveProfile() {
   const name = document.getElementById('setup-name').value.trim();
-  let username = document.getElementById('setup-username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  let username = document.getElementById('setup-username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
   const errEl = document.getElementById('setup-error');
   errEl.innerText = '';
-  if (!name || !username){ errEl.innerText = 'Please fill in both fields.'; return; }
-  if (username.length < 3){ errEl.innerText = 'Username must be at least 3 characters.'; return; }
 
-  const query = await db.collection('users').where('username','==',username).get();
-  if (!query.empty){ errEl.innerText = 'That username is taken.'; return; }
+  if (!name || !username) { 
+    errEl.innerText = 'Please fill in both fields.'; 
+    return; 
+  }
+  if (username.length < 3) { 
+    errEl.innerText = 'Username must be at least 3 characters.'; 
+    return; 
+  }
 
-  userProfile = {
-    uid: currentUser.uid,
-    name, username,
-    email: currentUser.email || '',
-    color: colorForString(name),
-    friends: [],
-    incomingRequests: [],
-    outgoingRequests: [],
-    presence: { state: 'online', lastChanged: FieldValue.serverTimestamp() }
-  };
-  await db.collection('users').doc(currentUser.uid).set(userProfile);
-  document.getElementById('profile-setup-screen').classList.add('hidden');
+  try {
+    const query = await db.collection('users').where('username', '==', username).get();
+    
+    let isTakenByOther = false;
+    query.forEach(doc => {
+      if (doc.id !== currentUser.uid) {
+        isTakenByOther = true;
+      }
+    });
+
+    if (isTakenByOther) {
+      errEl.innerText = 'That username is taken. Try another!';
+      return;
+    }
+
+    userProfile = {
+      uid: currentUser.uid,
+      name: name,
+      username: username,
+      email: currentUser.email || '',
+      color: colorForString(name),
+      friends: [],
+      incomingRequests: [],
+      outgoingRequests: [],
+      presence: { state: 'online', lastChanged: FieldValue.serverTimestamp() }
+    };
+
+    await db.collection('users').doc(currentUser.uid).set(userProfile, { merge: true });
+    document.getElementById('profile-setup-screen').classList.add('hidden');
+  } catch (err) {
+    console.error(err);
+    errEl.innerText = 'Database error: ' + err.message;
+  }
 }
 
 // --- PRESENCE ENGINE ---
